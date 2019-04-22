@@ -61,8 +61,7 @@ namespace matrixGif
             Matrix matrix,
             uint latinCharOffset)
         {
-            IList<Image<Rgba32>> frames = new List<Image<Rgba32>>();
-            var time = DebugHelpers.MeasureTime(() => GenerateImagesFromMatrix(imageSize, fontSize, font, matrix, frames, latinCharOffset));
+            (IList<Image<Rgba32>> frames, float time) = DebugHelpers.MeasureTime<IList<Image<Rgba32>>>(() => GenerateImagesFromMatrix(imageSize, fontSize, font, matrix, frames, latinCharOffset));
             log.Write($"generating the gif took {time} miliseconds");
             
             log.Write("saving the gif...");
@@ -92,16 +91,15 @@ namespace matrixGif
             }
         } 
 
-        private static void GenerateImagesFromMatrix(
+        private static IList<Image<Rgba32>> GenerateImagesFromMatrix(
             Size imageSize,
              uint fontSize, 
              Font font, 
              Matrix matrix, 
-             IList<Image<Rgba32>> frames,
              uint latinCharOffset)
         {
             uint frameNumber = 0;
-            
+            var frames = new List<Image<Rgba32>>();            
             while (true)
             {
                 var raining = matrix.MoveState();
@@ -112,6 +110,7 @@ namespace matrixGif
                 log.Write($"created image/frame nr {frameNumber}");
                 frameNumber++;
             }
+            return frames;
         }
     }
 }
