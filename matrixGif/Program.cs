@@ -73,15 +73,15 @@ namespace matrixGif
             }
         }
 
-        private static void Generate3TestFrames(
+        private static IList<Image<Rgba32>> Generate3TestFrames(
             Size imageSize, 
             uint fontSize,
              Font font,
-              IList<Image<Rgba32>> frames,
               uint latinCharOffset,
               uint rowsAmount,
               uint columnsAmount){
             var i = 0;
+             var frames = new List<Image<Rgba32>>();
             while (i < 3)
             {
                 var mat = ImageCreator.Test((int)rowsAmount,(int)columnsAmount);
@@ -89,6 +89,7 @@ namespace matrixGif
                 frames.Add(image);
                 i++;
             }
+            return frames;
         } 
 
         private static IList<Image<Rgba32>> GenerateImagesFromMatrix(
