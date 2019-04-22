@@ -9,6 +9,8 @@ using matrixCore;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace matrixGif
 {
@@ -81,7 +83,7 @@ namespace matrixGif
               uint rowsAmount,
               uint columnsAmount){
             var i = 0;
-             var frames = new List<Image<Rgba32>>();
+            var frames = new List<Image<Rgba32>>();
             while (i < 3)
             {
                 var mat = ImageCreator.Test((int)rowsAmount,(int)columnsAmount);
@@ -99,19 +101,22 @@ namespace matrixGif
              Matrix matrix, 
              uint latinCharOffset)
         {
-            uint frameNumber = 0;
-            var frames = new List<Image<Rgba32>>();            
+            var matrixStates = new List<MatrixChar[][]>();
             while (true)
             {
                 var raining = matrix.MoveState();
+                matrixStates.Add((MatrixChar[][])matrix.matrix.Clone());
                 if (!raining) break;
-                (Image<Rgba32> image, float time) = DebugHelpers.MeasureTime<Image<Rgba32>>(() => matrix.matrix.CreateImage(imageSize, font, fontSize,latinCharOffset));
-                log.Write($"time elapsed {time}");
-                frames.Add(image);
-                log.Write($"created image/frame nr {frameNumber}");
-                frameNumber++;
             }
-            return frames;
+
+            var test = new ConcurrentBag<Image<Rgba32>>();
+
+            Parallel.ForEach(matrixStates, state => {
+                var image = state.CreateImage(imageSize, font, fontSize,latinCharOffset);
+                test.Add(image);
+                });
+                
+            return test.ToList();
         }
     }
 }
