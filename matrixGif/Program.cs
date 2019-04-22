@@ -61,7 +61,7 @@ namespace matrixGif
             Matrix matrix,
             uint latinCharOffset)
         {
-            (IList<Image<Rgba32>> frames, float time) = DebugHelpers.MeasureTime<IList<Image<Rgba32>>>(() => GenerateImagesFromMatrix(imageSize, fontSize, font, matrix, frames, latinCharOffset));
+            (IList<Image<Rgba32>> frames, float time) = DebugHelpers.MeasureTime<IList<Image<Rgba32>>>(() => GenerateImagesFromMatrix(imageSize, fontSize, font, matrix, latinCharOffset));
             log.Write($"generating the gif took {time} miliseconds");
             
             log.Write("saving the gif...");
