@@ -101,22 +101,23 @@ namespace matrixGif
              Matrix matrix, 
              uint latinCharOffset)
         {
-            var matrixStates = new List<MatrixChar[][]>();
+            var matrixStates = new List<(MatrixChar[][] state, int index)>();
+            var index = 0;
             while (true)
             {
                 var raining = matrix.MoveState();
-                matrixStates.Add((MatrixChar[][])matrix.matrix.Clone());
+                matrixStates.Add(((MatrixChar[][])matrix.matrix.Clone(), index++));
                 if (!raining) break;
             }
 
-            var test = new ConcurrentBag<Image<Rgba32>>();
+            var images = new ConcurrentBag<(Image<Rgba32>, int)>();
 
-            Parallel.ForEach(matrixStates, state => {
-                var image = state.CreateImage(imageSize, font, fontSize,latinCharOffset);
-                test.Add(image);
+            Parallel.ForEach(matrixStates, stateIndex => {
+                var image = stateIndex.Item1.CreateImage(imageSize, font, fontSize,latinCharOffset);
+                images.Add((image, stateIndex.Item2));
                 });
-                
-            return test.ToList();
+
+            return images.OrderBy(i => i.Item2).Select(i => i.Item1).ToList();
         }
     }
 }
